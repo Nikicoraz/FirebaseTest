@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/main.css">
+    <title>Create Post</title>
+</head>
+<body>
+    <div class="toggler">
+        <span id="open-nav">&#9776; Menu</span>
+    </div>
+    <nav id="nav" class="side-nav">
+    <ul>
+        <li><h2>Your Mom App</h2></li>
+        <a href="#" class="closebtn" id="close-nav">&times; </a>
+        <li><a href="index.html">Home</a></li>
+    </ul>
+    </nav>
+    <main id="main">
+        <h1 id="create" style="margin: 0 auto; width:70%;">Create a <b>new</b> post</h1>
+        <form method="POST" id="create-form">
+            <p>Fill the form below in order to create a new post</p>
+            <input type="text" id="title" placeholder="Post Title">
+            <textarea id="content" placeholder="Post Content"></textarea>
+            <input type="file" id="cover">
+            <input id="submit" type="submit" value="Submit">
+        </form>
+        <div id="progress-handler">
+            <p>Processing the Request, please stand by...</p>
+            <progress id="progress-bar" value="" max="100"></progress>
+        </div>
+    </main>
+    
+    <script type="module" src="./functions/main.js"></script> 
+</body>
+</html>

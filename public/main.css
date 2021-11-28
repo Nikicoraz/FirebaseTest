@@ -1,0 +1,232 @@
+:root{
+    --nav: rgb(88, 88, 88);
+}
+body{
+    font-family: 'Courier New', Courier, monospace;
+    padding: 0px;
+    margin: 0px;
+    background-color: azure;
+}
+body *{
+    transition: all 0.5s ease-out;
+}
+main{
+    margin-left: 10px;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+main.postContainer{
+    width: 70%;
+    margin: 0 auto;
+}
+
+header{
+    height: 500px;
+    position: relative;
+    z-index: -1;
+    background: rgb(192, 192, 192);
+    margin-top: -24px;
+    background: url("https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80");
+    background-size: cover;
+}
+header h1{
+    padding-top: 200px;
+    font-size: 80px;
+    color: azure;
+    font-weight: 400;
+    padding-left: 400px;
+}
+form{
+    width: 70%;
+    margin: 0 auto;
+}
+form *{
+    width: 100%;
+    display: block;
+    padding: 10px;
+    margin-top: 10px;
+}
+form input[type="submit"]{
+    background-color: white;
+    border: 1px solid black;
+    color: var(--nav);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    margin: 0 auto;
+    width: 120px;
+    cursor: pointer;
+}
+nav ul{
+    list-style: none;
+}
+#create{
+    font-weight: 400;
+    font-size: 50px;
+}
+#progress-handler{
+    width: 70%;
+    margin: 0 auto;
+}
+.side-nav h2{
+    color: white;
+}
+
+.side-nav a{
+    padding: 10px;
+    text-decoration: none;
+    font-size: 20px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+}
+
+.side-nav a:hover{
+    color: aquamarine;
+}
+
+.side-nav .closebtn{
+    position: absolute;
+    top: 0px;
+    right: 25px;
+    font-size: 36px;
+}
+
+#open-nav{
+    padding: 10px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    font-size: 20px;
+}
+#posts{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.post{
+    width: 100%;
+    max-width: 400px;
+    margin: 10px;
+}
+.post > div{
+    display: block;
+    height: 300px;
+    background-size: 120%;
+    background-repeat: space;
+}
+.post > div:hover{
+    background-size: 100%;
+    transition: 0.5s;
+}
+.post > a{
+    color: #333;
+    font-size: 14px;
+    font-weight: bolder;
+    display: block;
+    margin-top: 20px;
+}
+#post img{
+    -webkit-box-shadow: 0px 10px 138px -66px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 10px 138px -66px rgba(0,0,0,0.75);
+    box-shadow: 0px 10px 138px -66px rgba(0,0,0,0.75);
+}
+
+#loading{
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#edit, #delete{
+    position: relative;
+    background: none;
+    padding: 10px;
+    display: none;
+    margin-top: 10px;
+    background-color: rgb(105, 105, 105);
+    color: white;
+    border: none;
+    width: 90px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#edit{
+    margin-bottom: 10px;
+    
+}
+#progress-handler{
+    display: none;
+}
+
+#back{
+    display: block;
+    width: 90px;
+    height: 30px;
+    padding: 10px 20px;
+    background-color: rgb(78, 78, 78);
+    color: azure;
+    text-decoration: none;
+    font-weight: bolder;
+    font-size: 20px;
+    border-radius: 6%;
+    margin-bottom: 20px;
+    text-align: center;
+}
+#editFormContainer{
+    margin-bottom: 20px;
+    
+}
+#editFormContainer *{
+    margin-right: 10px;
+}
+.side-nav{
+    height: 100%;
+    width: 0px;
+    position: fixed;
+    z-index: 10;
+    top: 0px;
+    left: 0px;
+    background: #333;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    white-space: nowrap;
+}
+.toggler{
+    padding: 10px;
+    background: var(--nav);
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+.lds-dual-ring {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+}
+.lds-dual-ring:after {
+    content: " ";
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 6px solid rgb(0, 0, 0);
+    border-color: rgb(0, 0, 0) transparent rgb(0, 0, 0) transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
