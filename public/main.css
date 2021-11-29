@@ -37,6 +37,12 @@ header h1{
     font-weight: 400;
     padding-left: 400px;
 }
+header h3{
+    font-size: 50px;
+    color: azure;
+    font-weight: 400;
+    padding-left: 200px;
+}
 form{
     width: 70%;
     margin: 0 auto;
