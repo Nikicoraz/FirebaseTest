@@ -1,6 +1,6 @@
 //#region no toca
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js';
-import { getFirestore, doc, setDoc, collection, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, collection, getDocs, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-storage.js';
 
 const firebaseConfig = {
@@ -159,7 +159,7 @@ const appendEditForm = async() =>{
         if(titleInput.value != "" && contentTextarea.value != ""){
             if(coverFile.files[0] !== undefined){
                 const cover = coverFile.files[0];
-                const storage = ref(getStorage(), cover.name);
+                const storage = await ref(getStorage(), cover.name);
                 
                 console.debug("Updating file...");
 
@@ -249,7 +249,7 @@ if(createForm != null){
             let cover = document.getElementById("cover").files[0];
 
             const storageRef = getStorage(app);
-            const storageChild = ref(storageRef, cover.name);
+            const storageChild = await ref(storageRef, cover.name);
             
             const postCover = uploadBytesResumable(storageChild, cover);
 
@@ -288,7 +288,7 @@ if(createForm != null){
             console.log("post added successfully");
             
             if(postSubmitBtn != null){
-                window.location.replace("index.html");
+                window.location.replace("/");
                 postSubmitBtn.disabled = false;
             }
         }else{
@@ -298,6 +298,20 @@ if(createForm != null){
 }
 
 //#endregion
+
+if(deleteBtn != null){
+    deleteBtn.addEventListener("click", async() =>{
+        const postId = getPostIdFromURL();
+        let post = await getDoc(doc(getFirestore(), "posts", postId)).catch(err =>{console.log(err)});
+
+        const storage = await deleteObject(ref(getStorage(), post.data().fileref)).catch(err =>{console.log(err)});
+        await deleteDoc(doc(getFirestore(), "posts", postId));
+
+        window.location.replace("/")
+
+    });
+}
+
 
 // Check if the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", (e) =>{
