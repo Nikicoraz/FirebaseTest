@@ -33,6 +33,13 @@ const editBtn = document.querySelector("#edit")
 const singlePost = document.querySelector("#post")
 const editFormContainer = document.querySelector("#editFormContainer");
 
+let currentTitle;
+let currentId;
+let currentContent;
+let currentCover;
+
+
+
 // Globali
 let editMode = false;
 
@@ -52,6 +59,12 @@ const getPost = async() =>{
         loading.innerHTML = "<div><div class='lds-dual-ring'><div></div></div><p>Loading Post...</p></div>";
             
         let post = await getDoc(doc(getFirestore(), "posts", postId)).catch(err =>{console.log(err)});
+
+        currentId = post.id;
+        currentContent = post.data().content;
+        currentTitle = post.data().title;
+        currentCover = post.data().fileref;
+
         loading.innerHTML = ""
         if(post && deleteBtn != null){
             deleteBtn.style.display = "block";
@@ -113,8 +126,6 @@ const createChildren = (arr) =>{
 }
 
 const appendEditForm = async() =>{
-    let postId = getPostIdFromURL();
-    let post = await getDoc(doc(getFirestore(), "posts", postId)).catch(err =>{console.error(err)});
     let d;
 
     let form = document.createElement("form");
@@ -123,7 +134,7 @@ const appendEditForm = async() =>{
 
     let titleInput = document.createElement("input");
     titleInput.setAttribute("type", "text");
-    titleInput.setAttribute("value", post.data().title);
+    titleInput.setAttribute("value", currentTitle);
     titleInput.id = "editTitle";
 
     let contentTextarea = document.createElement("textarea");
@@ -149,17 +160,17 @@ const appendEditForm = async() =>{
     form.appendChild(submit);
     editFormContainer.appendChild(form);
 
-    contentTextarea.value = post.data().content;
-    oldCover.value = post.data().fileref;
+    contentTextarea.value = currentContent;
+    oldCover.value = currentCover;
 
     document.querySelector("#editForm").addEventListener("submit", async(e) =>{
         e.preventDefault();
         
-        const postId = await getPostIdFromURL();
         if(titleInput.value != "" && contentTextarea.value != ""){
             if(coverFile.files[0] !== undefined){
                 const cover = coverFile.files[0];
-                const storage = await ref(getStorage(), cover.name);
+                let coverName = await checkIfExists(cover.name);
+                const storage = await ref(getStorage(), coverName);
                 
                 console.debug("Updating file...");
 
@@ -196,13 +207,13 @@ const appendEditForm = async() =>{
                         }
                         console.log(post.fileref);
 
-                        await setDoc(doc(getFirestore(), "posts", postId), post);
+                        await setDoc(doc(getFirestore(), "posts", currentId), post);
                         resolve();
                         location.reload();
                     })
                 });
             }else{
-                await setDoc(doc(getFirestore(), "posts", postId), {
+                await setDoc(doc(getFirestore(), "posts", currentId), {
                     title: titleInput.value,
                     content: contentTextarea.value
                 }, {merge: true});
@@ -238,6 +249,21 @@ if(editBtn != null){
 
 //#region Salva Post
 
+const checkIfExists = async(fileName) =>{
+    const reference = ref(getStorage(), fileName);
+    return await getDownloadURL(reference).then(async() =>{
+        let fileArray = fileName.split(".");
+        fileArray[fileArray.length - 2] += Math.floor(Math.random() * 10) + ".";
+        fileName = fileArray.reduce((acc, cur) =>{
+            return acc + cur;
+        }, "");
+        return await checkIfExists(fileName)
+    }).catch((e) =>{
+        console.info(fileName);
+        return fileName;
+    })
+}
+
 if(createForm != null){
     let d;
     createForm.addEventListener("submit", async(e) => {
@@ -248,9 +274,10 @@ if(createForm != null){
             let content = document.getElementById("content").value;
             let cover = document.getElementById("cover").files[0];
 
+            let coverName = await checkIfExists(cover.name);
+
             const storageRef = getStorage(app);
-            const storageChild = await ref(storageRef, cover.name);
-            
+            const storageChild = await ref(storageRef, coverName);
             const postCover = uploadBytesResumable(storageChild, cover);
 
             await new Promise((resolve) =>{
@@ -292,7 +319,7 @@ if(createForm != null){
                 postSubmitBtn.disabled = false;
             }
         }else{
-            console.log("Must fill all the inputs!");
+            alert("Must fill all the inputs!");
         }
     });
 }
@@ -301,11 +328,9 @@ if(createForm != null){
 
 if(deleteBtn != null){
     deleteBtn.addEventListener("click", async() =>{
-        const postId = getPostIdFromURL();
-        let post = await getDoc(doc(getFirestore(), "posts", postId)).catch(err =>{console.log(err)});
 
-        const storage = await deleteObject(ref(getStorage(), post.data().fileref)).catch(err =>{console.log(err)});
-        await deleteDoc(doc(getFirestore(), "posts", postId));
+        const storage = await deleteObject(ref(getStorage(), currentCover)).catch(err =>{console.log(err)});
+        await deleteDoc(doc(getFirestore(), "posts", currentId));
 
         window.location.replace("/")
 
