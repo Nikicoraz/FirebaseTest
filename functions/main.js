@@ -84,12 +84,6 @@ const getPost = async() =>{
         currentCover = post.data().fileref;
 
         loading.innerHTML = ""
-        if(post && deleteBtn != null){
-            deleteBtn.style.display = "block";
-        }
-        if(post && deleteBtn != null){
-            editBtn.style.display = "block";
-        }
 
         createChild(post.data());
 
@@ -281,19 +275,27 @@ const paginate = async() =>{
 //#region Salva Post
 
 if(editBtn != null){
-    editBtn.addEventListener("click", () =>{
-        if(!editMode){
-            editMode = true;
-            console.debug("Enabling Edit Mode");
+    if(document.cookie
+        .split(';')
+        .map(cookie => cookie.split('='))
+        .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {}).admin == "true"){
+            editBtn.addEventListener("click", () =>{
+            if(!editMode){
+                editMode = true;
+                console.debug("Enabling Edit Mode");
 
-            appendEditForm();
-        }else{
-            editMode = false;
-            console.log("Disabling Edit Mode");
+                appendEditForm();
+            }else{
+                editMode = false;
+                console.log("Disabling Edit Mode");
 
-            removeEditForm();
-        }
-    })
+                removeEditForm();
+            }
+        })
+        editBtn.style.display = "block";
+    }else{
+        editBtn.style.display = "none";
+    }
 }
 
 const checkIfExists = async(fileName) =>{
@@ -373,14 +375,20 @@ if(createForm != null){
 //#endregion
 
 if(deleteBtn != null){
-    deleteBtn.addEventListener("click", async() =>{
-
-        const storage = await deleteObject(ref(getStorage(), currentCover)).catch(err =>{console.log(err)});
-        await deleteDoc(doc(getFirestore(), "posts", currentId));
-
-        window.location.replace("/")
-
-    });
+    if(document.cookie
+        .split(';')
+        .map(cookie => cookie.split('='))
+        .reduce((accumulator, [key, value]) => ({ ...accumulator, [key.trim()]: decodeURIComponent(value) }), {}).admin == "true"){
+        deleteBtn.addEventListener("click", async() =>{
+            const storage = await deleteObject(ref(getStorage(), currentCover)).catch(err =>{console.log(err)});
+            await deleteDoc(doc(getFirestore(), "posts", currentId));
+    
+            window.location.replace("/")
+        });
+        deleteBtn.style.display = "block";
+    }else{
+        deleteBtn.style.display = "none";
+    }
 }
 
 if(pagination != null){

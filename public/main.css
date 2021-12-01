@@ -184,6 +184,7 @@ nav ul{
     border-radius: 6%;
     margin-bottom: 20px;
     text-align: center;
+    line-height: 30px;
 }
 #editFormContainer{
     margin-bottom: 20px;
