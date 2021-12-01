@@ -192,6 +192,22 @@ nav ul{
 #editFormContainer *{
     margin-right: 10px;
 }
+#pagination{
+    margin: 0 auto;
+    width: 10%;
+    height: 25px;
+    padding: 20px 0;
+    border: 3px solid black;
+    line-height: 25px;
+    text-align: center;
+    user-select: none;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}
+#pagination:hover{
+    background-color: rgb(196, 196, 196);
+}
 .side-nav{
     height: 100%;
     width: 0px;

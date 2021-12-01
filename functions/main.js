@@ -1,6 +1,6 @@
 //#region no toca
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js';
-import { getFirestore, doc, setDoc, collection, getDocs, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, collection, getDocs, getDoc, deleteDoc, orderBy, query, limit, startAfter } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject  } from 'https://www.gstatic.com/firebasejs/9.5.0/firebase-storage.js';
 
 const firebaseConfig = {
@@ -11,7 +11,6 @@ const firebaseConfig = {
     messagingSenderId: "160048715488",
     appId: "1:160048715488:web:39bfa261939ff886866285"
 };
-
 
 // Initialize Firebase
 
@@ -32,25 +31,44 @@ const deleteBtn = document.querySelector("#delete")
 const editBtn = document.querySelector("#edit")
 const singlePost = document.querySelector("#post")
 const editFormContainer = document.querySelector("#editFormContainer");
+const pagination = document.querySelector("#pagination");
 
 let currentTitle;
 let currentId;
 let currentContent;
 let currentCover;
-
+let lastVisible;
+let postsSize;
+let size;
 
 
 // Globali
 let editMode = false;
+let postsArray = [];
 
 const getPosts = async() =>{
-    let postsArray = [];
-    let docs = await getDocs(collection(getFirestore(), "posts")).catch(err => console.log(error));
-    docs.forEach(doc =>{
+    let docs;
+    let postsRef = await query(collection(getFirestore(), "posts"), orderBy("title"), limit(10));
+
+
+    let _size = await getDocs(collection(getFirestore(), "posts"));
+    size = _size.size;
+    await getDocs(postsRef).then(documentSnapshots =>{
+        docs = documentSnapshots;
+        console.log(docs);
+        lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+        console.log("last", lastVisible);
+    });
+    docs["docs"].forEach(doc =>{
         postsArray.push({"id": doc.id, "data": doc.data()});
     });
-
-    createChildren(postsArray);
+    if(postsArray.length > 0){
+        pagination.style.display = "block";
+    }else{
+        pagination.style.display = "none";
+    }
+    await createChildren(postsArray);
+    postsSize = posts.childNodes.length;
 }
 
 const getPost = async() =>{
@@ -106,7 +124,7 @@ const createChild = (data) =>{
     }
 }
 
-const createChildren = (arr) =>{
+const createChildren = async(arr) =>{
     if(posts != null){
         arr.map(post =>{
             let div = document.createElement("div");
@@ -194,7 +212,6 @@ const appendEditForm = async() =>{
                     }, async() =>{
                         const downloadUrl = await getDownloadURL(postCover.snapshot.ref);
                         d = downloadUrl;
-                        console.log(d);
                         await deleteObject(ref(getStorage(), oldCover.value)).then(console.log("Previous Deleted!")).catch(err =>{
                             console.log(err);
                         })
@@ -231,6 +248,38 @@ const removeEditForm = () =>{
     editFormContainer.removeChild(editForm);
 }
 
+const paginate = async() =>{
+    let docs;
+    let postsRef = query(collection(getFirestore(), "posts"), orderBy("title"), startAfter(lastVisible), limit(5));    
+    
+    await getDocs(postsRef).then(documentSnapshots =>{
+        docs = documentSnapshots;
+        
+        lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+        docs["docs"].forEach(doc =>{
+            let div = document.createElement("div");
+            let cover = document.createElement("div");
+            let anchor = document.createElement("a");
+            let anchorNode = document.createTextNode(doc.data().title);
+            anchor.setAttribute("href", `post.html#/${doc.id}`);
+
+            anchor.appendChild(anchorNode);
+            cover.style.backgroundImage = `url(${doc.data().cover})`;
+            div.classList.add("post");
+            div.appendChild(cover);
+            div.appendChild(anchor);
+            posts.appendChild(div);
+            postsSize++;
+        });
+    });
+    if(postsSize >= size){
+        pagination.style.display = "none";
+    }
+}
+
+
+//#region Salva Post
+
 if(editBtn != null){
     editBtn.addEventListener("click", () =>{
         if(!editMode){
@@ -246,8 +295,6 @@ if(editBtn != null){
         }
     })
 }
-
-//#region Salva Post
 
 const checkIfExists = async(fileName) =>{
     const reference = ref(getStorage(), fileName);
@@ -299,7 +346,6 @@ if(createForm != null){
                 }, async() =>{
                     const downloadUrl = await getDownloadURL(postCover.snapshot.ref);
                     d = downloadUrl;
-                    console.log(d);
                     resolve();
                 })
             });
@@ -337,10 +383,18 @@ if(deleteBtn != null){
     });
 }
 
+if(pagination != null){
+    pagination.addEventListener("click", async() =>{
+        await paginate();
+    })
+}
+
 
 // Check if the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", (e) =>{
-    getPosts();
+    if(posts != null){
+        getPosts();
+    }
     getPost();
 })
 
